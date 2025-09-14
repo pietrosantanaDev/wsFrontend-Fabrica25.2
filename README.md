@@ -39,3 +39,5 @@ Uma Pokédex simples feita com **HTML, CSS e JavaScript puro**, usando a [PokéA
    ```bash
    git clone https://github.com/pietrosantanaDev/wsFrontend-Fabrica25.2.git
    cd wsFrontend-Fabrica25.2
+
+https://ws-frontend-fabrica25-2-sigma.vercel.app/
