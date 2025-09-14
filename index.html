@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pokedex </title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-row">
+      <a href="/" class="brand">Pokedex</a>
+      <nav class="nav">
+        <a href="/" aria-current="page">Início</a>
+        <a href="/favoritos">Favoritos</a>
+        <a href="https://pokeapi.co" target="_blank" rel="noopener">PokeAPI</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="actions">
+      <div class="search-row">
+        <input id="q" type="search" placeholder="Pesquisar por nome (ex: pikachu)" />
+        <button id="btnSearch" class="btn">Buscar</button>
+      </div>
+      <div class="view-row">
+        <label class="muted">Visualização:</label>
+        <button id="btnView" class="btn-outline">Grade</button>
+      </div>
+    </section>
+    <div id="st" class="status"></div>
+    <section>
+      <h2 class="section-title">Lista de Pokémons</h2>
+      <ul id="list" class="grid"></ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>Dados por <a href="https://pokeapi.co" target="_blank" rel="noopener">PokeAPI</a>. © 2025</small>
+    </div>
+  </footer>
+
+  <script src="./js/main.js" type="module"></script>
+</body>
+</html>

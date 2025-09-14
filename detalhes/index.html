@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Detalhes do Pokémon</title>
+  <link rel="stylesheet" href="../styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-row">
+      <a href="../index.html" class="brand">← Voltar</a>
+      <nav class="nav">
+        <a href="../index.html">Início</a>
+        <a href="../favoritos/index.html">Favoritos</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <h1 class="section-title">Detalhes do Pokémon</h1>
+    <div id="st" class="status" aria-live="polite"></div>
+    <article id="card" class="card card-pad"></article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <small>Dados por <a href="https://pokeapi.co" target="_blank" rel="noopener">PokéAPI</a></small>
+    </div>
+  </footer>
+
+  <script>
+    const API = "https://pokeapi.co/api/v2";
+    const elSt = document.querySelector("#st");
+    const elCard = document.querySelector("#card");
+
+    const COLOR_HEX = {
+      black:"#111827", blue:"#3b82f6", brown:"#92400e", gray:"#6b7280",
+      green:"#10b981", pink:"#ec4899", purple:"#8b5cf6",
+      red:"#ef4444", white:"#f3f4f6", yellow:"#f59e0b"
+    };
+    const COLOR_LIGHT = {
+      black:"#374151", blue:"#93c5fd", brown:"#d97706", gray:"#cbd5e1",
+      green:"#6ee7b7", pink:"#f9a8d4", purple:"#c4b5fd",
+      red:"#fca5a5", white:"#ffffff", yellow:"#fde68a"
+    };
+
+    function setSt(s){ elSt.textContent = s; }
+    function clearSt(){ elSt.textContent = ""; }
+    function pad3(n){ return String(n).padStart(3,"0"); }
+
+    function applyTheme(colorName){
+      const hex = COLOR_HEX[colorName] || "#4cc9f0";
+      const hex2 = COLOR_LIGHT[colorName] || "#72efdd";
+      document.documentElement.style.setProperty("--accent", hex);
+      document.documentElement.style.setProperty("--accent2", hex2);
+    }
+
+    function getId(){
+      const u = new URL(location.href);
+      const q = u.searchParams.get("id");
+      if (q) return q;
+      const parts = u.pathname.split("/").filter(Boolean);
+      const i = parts.indexOf("detalhes");
+      if (i>=0 && i<parts.length-1) return parts[i+1];
+      throw new Error("ID não encontrado");
+    }
+
+    async function fetchPokemon(id){
+      const n = Number(id); const key = Number.isNaN(n) ? id : String(n);
+      const r = await fetch(`${API}/pokemon/${encodeURIComponent(key)}`);
+      if(!r.ok) throw new Error("HTTP "+r.status);
+      return r.json();
+    }
+    async function fetchColorName(id){
+      const r = await fetch(`${API}/pokemon-species/${id}`);
+      if (!r.ok) return null;
+      const s = await r.json();
+      return s && s.color && s.color.name ? s.color.name : null;
+    }
+
+    function render(p){
+      const name = p.name;
+      const id = pad3(p.id);
+      const img = (p.sprites && p.sprites.front_default)
+        ? `<img class="media" src="${p.sprites.front_default}" alt="${name}" />`
+        : `<div class="media placeholder">?</div>`;
+      const types = (p.types||[]).map(t=>t && t.type ? t.type.name : "").filter(Boolean).join(", ");
+      const weight = p.weight;
+      const baseExp = p.base_experience;
+
+      elCard.innerHTML = `
+        <div class="row row-gap" style="margin-bottom:.75rem">
+          ${img}
+          <div>
+            <div class="id">#${id}</div>
+            <h2 class="name big">${name}</h2>
+          </div>
+        </div>
+        <div class="info-grid">
+          <div class="info-box"><div class="muted small">Nome</div><div class="capitalize">${name}</div></div>
+          <div class="info-box"><div class="muted small">ID</div><div>#${id}</div></div>
+          <div class="info-box"><div class="muted small">Imagem</div><div>${img}</div></div>
+          <div class="info-box"><div class="muted small">Tipo(s)</div><div class="capitalize">${types||"—"}</div></div>
+          <div class="info-box"><div class="muted small">Peso</div><div>${weight}</div></div>
+          <div class="info-box"><div class="muted small">Experiência Base</div><div>${baseExp}</div></div>
+        </div>
+      `;
+    }
+
+    (async () => {
+      try {
+        setSt("Carregando detalhes...");
+        const raw = getId();
+        const data = await fetchPokemon(raw);
+        render(data);
+
+        // tema dinâmico
+        const colorName = await fetchColorName(data.id);
+        if (colorName) applyTheme(colorName);
+
+        clearSt();
+      } catch (e) {
+        setSt("Erro: " + (e && e.message ? e.message : String(e)));
+      }
+    })();
+  </script>
+</body>
+</html>
